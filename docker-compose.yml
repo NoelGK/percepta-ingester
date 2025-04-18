@@ -1,0 +1,17 @@
+name: percepta
+
+networks:
+  percepta:
+    external: true
+
+services:
+  percepta:
+    image: percepta:latest
+
+    container_name: percepta
+
+    volumes:
+      - ./src:/app/src
+    
+    networks:
+      - percepta

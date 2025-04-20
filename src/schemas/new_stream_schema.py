@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class NewStreamSchema(BaseModel):
@@ -7,9 +7,9 @@ class NewStreamSchema(BaseModel):
     host: str
     port: str
     stream: str
-    security: str
-    user: str
-    password: str
+    security: Optional[bool] = False
+    user: Optional[str] = ''
+    password: Optional[str] = ''
     frame_width: Optional[int] = 1920
     frame_height: Optional[int] = 1080
 
@@ -18,6 +18,24 @@ class NewStreamSchema(BaseModel):
         return f"rtsp://{self._credentials()}{self.host}:{self.port}/{self.stream}"
     
     def _credentials(self) -> str:
-        if self.security != "":
+        if self.security:
             return f"{self.user}:{self.password}@"
-        return ""
+        return ''
+
+    @field_validator("device_id")
+    def device_id_alphanumeric(cls, field: str):
+        if not field.replace('_', '').isalnum():
+            raise ValueError("Device id for new camera must contain only alpha-numeric values or '_'")
+        return field
+
+    @field_validator("frame_width", "frame_height")
+    def frame_size_positive(cls, field: int):
+        if field >= 0:
+            raise ValueError("Frame dimensions must be positive integers")
+        return field
+    
+    @field_validator("user", "password")
+    def security_provided(cls, field):
+        if cls.security and field == '':
+            raise ValueError("Authentication must be provided if 'security' is enabled")
+        return field

@@ -1,41 +1,17 @@
-import cv2
-import redis
-import base64
-import numpy as np
+from fastapi import APIRouter
 from config.config import settings
 from ffmpeg import FFmpegWatcher
 from config.logging import appLogging as logging
+from schemas.new_stream_schema import NewStreamSchema
+
+# Ingestion 
+manager = IngestionManager()
 
 
-def main():
-    logging.info("Initializing video capture service...")
-
-    redis_client = redis.Redis(
-        host=settings.REDIS.HOST, 
-        port=settings.REDIS.PORT,
-        password=settings.REDIS.PASSWORD
-    )
-    logging.info(f"Connected to Redis stream at {settings.REDIS.HOST}")
-
-    ffmpeg_watcher = FFmpegWatcher(settings.RTSP)
-    ffmpeg_process = ffmpeg_watcher.ingest()
-    frame_byte_size = ffmpeg_watcher.frame_width * ffmpeg_watcher.frame_height * 3
-
-    while True:
-        raw_frame = ffmpeg_process.stdout.read(frame_byte_size)
-        if len(raw_frame) != frame_byte_size:
-            logging.warning("Incomplete frame read from FFmpeg")
-
-        try:
-            frame = np.frombuffer(raw_frame, np.uint8).reshape(
-                (ffmpeg_watcher.frame_height, ffmpeg_watcher.frame_width, 3)
-            )
-            _, buffer = cv2.imencode(".jpg", frame)
-            encoded_frame = base64.b64encode(buffer).decode("utf-8")
-            redis_client.xadd("frame_stream", {"frame": encoded_frame}, maxlen=100)
-        except Exception as e:
-            logging.error(f"Failed to process frame:\n {e}")
+# API router and endpoints
+router = APIRouter(prefix="/api/v1", tags=["Base"])
 
 
-if __name__ == "__main__":
-    main()
+@router.post("/new-stream", status_code=200)
+def new_stream(new_stream: NewStreamSchema):
+    pass

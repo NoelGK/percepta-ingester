@@ -23,3 +23,6 @@ class IngestionManager:
         except KeyError:
             logging.error(f"Tried to stop stream {stream_name}, which is not in the active processes")
             return False
+
+    def get_active_streams(self) -> dict:
+        return [device_id for device_id in self.processes]

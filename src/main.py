@@ -1,5 +1,6 @@
 import redis
-from fastapi import APIRouter
+from typing import List
+from fastapi import FastAPI, APIRouter
 from config.config import settings
 from config.logging import appLogging as logging
 from manager import IngestionManager
@@ -20,7 +21,6 @@ logging.info(f"Ingestion manager initialized")
 
 # API router and endpoints
 router = APIRouter(prefix="/api/v1", tags=["Base"])
-logging.info(f"Stream management API initialized")
 
 
 @router.post("/new-stream", status_code=200)
@@ -32,3 +32,12 @@ def new_stream(new_stream: NewStreamSchema) -> str:
 @router.delete("/stop-stream/{stream_name}", status_code=200)
 def stop_stream(stream_name: str) -> bool:
     return manager.remove_stream(stream_name)
+
+
+@router.get("/active-streams", status_code=200)
+def active_streams() -> List:
+    return manager.get_active_streams()
+
+
+api = FastAPI()
+logging.info(f"Stream management API initialized")

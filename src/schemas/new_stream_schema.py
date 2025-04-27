@@ -30,7 +30,7 @@ class NewStreamSchema(BaseModel):
 
     @field_validator("frame_width", "frame_height")
     def frame_size_positive(cls, field: int):
-        if field >= 0:
+        if field <= 0:
             raise ValueError("Frame dimensions must be positive integers")
         return field
     

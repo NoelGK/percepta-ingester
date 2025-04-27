@@ -39,5 +39,13 @@ def active_streams() -> List:
     return manager.get_active_streams()
 
 
-api = FastAPI()
+api = FastAPI(
+    title="Percepta Ingestion manager API",
+    description="API for managing video stream ingestion using FFmpeg and Redis Streams.",
+    version="1.0.0",
+    docs_url="/docs",           # Swagger UI
+    redoc_url="/redoc",         # ReDoc alternative
+    openapi_url="/openapi.json" # OpenAPI schema
+)
+api.include_router(router)
 logging.info(f"Stream management API initialized")

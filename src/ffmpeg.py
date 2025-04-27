@@ -26,6 +26,7 @@ class FFmpegReaderThread(threading.Thread):
     
     def run(self):
         self.__start_ffmpeg()
+        logging.info(f"Reading {self.frame_size} bytes from ffmpeg")
         while self.running:
             raw_frame = self.ffmpeg_process.stdout.read(self.frame_size)
             if len(raw_frame) != self.frame_size:

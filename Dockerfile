@@ -23,4 +23,4 @@ ENV PYTHONPATH="/app/src"
 ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app/src
-CMD [ "gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:api", "--bind", "0.0.0.0:8001" ]
+CMD [ "gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:api", "--bind", "0.0.0.0:8000" ]

@@ -1,11 +1,11 @@
 from typing import Optional
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, model_validator
 
 
 class NewStreamSchema(BaseModel):
     device_id: str
     host: str
-    port: str
+    port: int
     stream: str
     security: Optional[bool] = False
     user: Optional[str] = ''
@@ -34,8 +34,8 @@ class NewStreamSchema(BaseModel):
             raise ValueError("Frame dimensions must be positive integers")
         return field
     
-    @field_validator("user", "password")
-    def security_provided(cls, field):
-        if cls.security and field == '':
+    @model_validator(mode="after")
+    def security_provided(self):
+        if self.security and (not self.user or not self.password):
             raise ValueError("Authentication must be provided if 'security' is enabled")
-        return field
+        return self

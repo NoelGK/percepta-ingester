@@ -1,4 +1,4 @@
-name: percepta
+name: percepta-ingester
 
 networks:
   percepta:
@@ -6,12 +6,12 @@ networks:
 
 services:
   percepta:
-    image: percepta:latest
+    image: percepta-ingester:latest
 
-    container_name: percepta
+    container_name: percepta-ingester
 
     ports:
-      - "8001:8001"
+      - "8000:8000"
 
     volumes:
       - ./src:/app/src

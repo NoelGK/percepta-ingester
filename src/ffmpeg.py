@@ -65,7 +65,7 @@ class FFmpegReaderThread(threading.Thread):
         self.ffmpeg_process = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
     def __encode_frame(self, raw_frame):
-        frame = np.frombuffer(raw_frame)
+        frame = np.frombuffer(raw_frame, np.uint8)
         frame = frame.reshape((self.rtsp.frame_height, self.rtsp.frame_width, 3))
         _, buffer = cv2.imencode(".jpg", frame)
         return base64.b64encode(buffer).decode("utf-8")

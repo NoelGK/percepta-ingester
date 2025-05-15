@@ -4,7 +4,6 @@ import base64
 import threading
 import subprocess
 import numpy as np
-from config.rtsp import RTSPSettings
 from config.logging import appLogging as logging
 from schemas.new_stream_schema import NewStreamSchema
 

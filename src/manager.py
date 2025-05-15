@@ -12,7 +12,8 @@ class IngestionManager:
     def add_stream(self, new_stream: NewStreamSchema) -> str:
         stream_name = f"frame_stream:{new_stream.device_id}"
         ffmpeg_reader = FFmpegReaderThread(new_stream, self.redis_client, stream_name)
-        self.processes[stream_name] = ffmpeg_reader.start()
+        self.processes[stream_name] = ffmpeg_reader
+        ffmpeg_reader.start()
         return stream_name
 
     def remove_stream(self, stream_name: str):

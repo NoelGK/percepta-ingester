@@ -4,7 +4,7 @@ from fastapi import FastAPI, APIRouter
 from config.config import settings
 from config.logging import appLogging as logging
 from manager import IngestionManager
-from schemas.new_stream_schema import NewStreamSchema
+from schemas.stream_schema import StreamSchema
 
 logging.info(f"Starting ingestion pipeline...")
 
@@ -23,15 +23,15 @@ logging.info(f"Ingestion manager initialized")
 router = APIRouter(prefix="/api/v1", tags=["Base"])
 
 
-@router.post("/new-stream", status_code=200)
-def new_stream(new_stream: NewStreamSchema) -> str:
-    new_stream_name = manager.add_stream(new_stream)
+@router.post("/start-stream", status_code=200)
+def start_stream(stream: StreamSchema) -> str:
+    new_stream_name = manager.start_stream(stream)
     return new_stream_name
 
 
-@router.delete("/stop-stream/{stream_name}", status_code=200)
-def stop_stream(stream_name: str) -> bool:
-    return manager.remove_stream(stream_name)
+@router.delete("/stop-stream/{stream_id}", status_code=200)
+def stop_stream(stream_id: int) -> bool:
+    return manager.stop_stream(stream_id)
 
 
 @router.get("/active-streams", status_code=200)

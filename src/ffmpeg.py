@@ -5,13 +5,13 @@ import threading
 import subprocess
 import numpy as np
 from config.logging import appLogging as logging
-from schemas.new_stream_schema import NewStreamSchema
+from schemas.stream_schema import StreamSchema
 
 
 class FFmpegReaderThread(threading.Thread):
     def __init__(
         self, 
-        camera_settings: NewStreamSchema,
+        camera_settings: StreamSchema,
         redis_client: redis.Redis,
         stream_name: str
     ):

@@ -15,6 +15,7 @@ services:
 
     volumes:
       - ./src:/app/src
+      - .env:/app/.env
     
     networks:
       - percepta

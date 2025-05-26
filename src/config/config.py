@@ -9,11 +9,9 @@ load_dotenv()
 
 @dataclass
 class Settings:
-    RTSP: RTSPSettings = RTSPSettings()
     REDIS: RedisConfig = RedisConfig()
-
-    CONCURRENCY: int = int(os.getenv("CELERY_CONCURRENCY", 1))
-    IMAGES_DIR: str = os.getenv("IMAGES_DIR", "/")
+    MAX_ILL_FRAMES: int = int(os.getenv("MAX_ILL_FRAMES", 100))
+    CAMERA_SHUTDOWN_MAX_TIME: int = int(os.getenv("CAMERA_SHUTDOWN_MAX_TIME", 20))
 
 
 settings = Settings()

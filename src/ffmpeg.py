@@ -6,6 +6,7 @@ import subprocess
 import numpy as np
 from config.logging import appLogging as logging
 from schemas.stream_schema import StreamSchema
+from config.config import settings
 
 
 class FFmpegReaderThread(threading.Thread):
@@ -22,29 +23,37 @@ class FFmpegReaderThread(threading.Thread):
         self.frame_size = self.rtsp.frame_width * self.rtsp.frame_height * 3
         self.running = True
         self.ffmpeg_process = None
+        self.ill_frames = 0
     
     def run(self):
         self.__start_ffmpeg()
         logging.info(f"Reading {self.frame_size} bytes from ffmpeg")
         while self.running:
+            # Read frame from ffmpeg process
             raw_frame = self.ffmpeg_process.stdout.read(self.frame_size)
-            if len(raw_frame) != self.frame_size:
-                logging.warning("Incomplete frame read from FFmpeg")
-                continue
 
+            # If frame cannot be read, skip it and increment number of ill frames
+            if len(raw_frame) != self.frame_size:
+                self.ill_frames += 1
+                continue
+            
+            # Try to encode the frame and send it to Redis.
             try:
                 encoded_frame = self.__encode_frame(raw_frame)
                 self.__send_to_stream(encoded_frame)
-
             except Exception as e:
                 logging.error(f"Failed to process frame from camera {self.rtsp.device_id}:\n {e}")
+
+            # If number of ill frames is too high, stop ingestion pipeline
+            if self.ill_frames > settings.MAX_ILL_FRAMES:
+                self.stop()
 
     def stop(self):
         logging.info(f"Stopping image acquisition from camera {self.rtsp.device_id}...")
         self.running = False
         try:
             self.ffmpeg_process.terminate()
-            self.ffmpeg_process.wait(timeout=10)
+            self.ffmpeg_process.wait(timeout=settings.CAMERA_SHUTDOWN_MAX_TIME)
             logging.info(f"Gracefully stopped process")
         except subprocess.TimeoutExpired:
             logging.warning(f"Camera {self.rtsp.device_id} did not shut down gracefully, force killing...")

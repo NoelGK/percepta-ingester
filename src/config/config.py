@@ -12,6 +12,8 @@ class Settings:
     REDIS: RedisConfig = RedisConfig()
     MAX_ILL_FRAMES: int = int(os.getenv("MAX_ILL_FRAMES", 100))
     CAMERA_SHUTDOWN_MAX_TIME: int = int(os.getenv("CAMERA_SHUTDOWN_MAX_TIME", 20))
+    TEST_FRAMES: int = int(os.getenv("TEST_FRAMES", 30))
+    RTSP_TIMEOUT: int = int(os.getenv("RTSP_TIMEOUT", 5))  # Timeout for RTSP socket connection in seconds
 
 
 settings = Settings()

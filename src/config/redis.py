@@ -9,4 +9,5 @@ load_dotenv()
 class RedisConfig:
     host = os.getenv("REDIS_HOST")
     port = os.getenv("REDIS_PORT")
+    db = os.getenv("REDIS_DB")
     password = os.getenv("REDIS_PASSWORD")

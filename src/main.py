@@ -13,6 +13,7 @@ logging.info(f"Starting ingestion pipeline...")
 redis_client = redis.Redis(
     host=settings.REDIS.host,
     port=settings.REDIS.port,
+    db=settings.REDIS.db,
     password=settings.REDIS.password
 )
 logging.info(f"Connected to Redis at {settings.REDIS.host}")

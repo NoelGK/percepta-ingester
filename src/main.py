@@ -1,10 +1,11 @@
 import redis
 from typing import List
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from config.config import settings
 from config.logging import appLogging as logging
 from manager import IngestionManager
 from schemas.stream_schema import StreamSchema
+from schemas.connection_status_schema import ConnectionStatus
 
 logging.info(f"Starting ingestion pipeline...")
 
@@ -12,6 +13,7 @@ logging.info(f"Starting ingestion pipeline...")
 redis_client = redis.Redis(
     host=settings.REDIS.host,
     port=settings.REDIS.port,
+    db=settings.REDIS.db,
     password=settings.REDIS.password
 )
 logging.info(f"Connected to Redis at {settings.REDIS.host}")
@@ -23,10 +25,13 @@ logging.info(f"Ingestion manager initialized")
 router = APIRouter(prefix="/api/v1", tags=["Base"])
 
 
-@router.post("/start-stream", status_code=200)
-def start_stream(stream: StreamSchema) -> str:
-    new_stream_name = manager.start_stream(stream)
-    return new_stream_name
+@router.post("/start-stream", status_code=201)
+def start_stream(stream: StreamSchema) -> int:
+    connection_status = manager.test_connection(stream)
+    if connection_status == ConnectionStatus.CONNECTED:
+        stream_id = manager.start_stream(stream)
+        return stream_id
+    raise HTTPException(status_code=401)
 
 
 @router.delete("/stop-stream/{stream_id}", status_code=200)

@@ -75,14 +75,13 @@ class FFmpegReaderThread(threading.Thread):
                 self.stop()
 
     def stop(self):
-        logging.info(f"Stopping image acquisition from camera {self.rtsp.device_id}...")
         self.running = False
         try:
             self.ffmpeg_process.terminate()
             self.ffmpeg_process.wait(timeout=settings.CAMERA_SHUTDOWN_MAX_TIME)
-            logging.info(f"Gracefully stopped process")
+            logging.info(f"Gracefully stopped ffmpeg process")
         except subprocess.TimeoutExpired:
-            logging.warning(f"Camera {self.rtsp.device_id} did not shut down gracefully, force killing...")
+            logging.info(f"FFmpeg process {self.rtsp.id} killed")
             self.ffmpeg_process.kill()
 
     def __start_ffmpeg(self) -> None:
